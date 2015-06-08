@@ -1,0 +1,34 @@
+<html>
+  <body>
+  <title>应用巡检自动化系统</title>
+  <h1>巡检结果</h1>
+  <h2>
+  <table>
+  <table border="1">
+  <tr>
+    <th>项目组</th>
+    <th>检测功能点总数</th>
+    <th>通过检测的功能点数目</th>
+    <th>全部通过</th>
+    <th>报告时间</th>
+    <th>详细报告</th>
+  </tr>
+  {% for report in report_list %}  
+  <tr>
+     <td>{{report.project_team}}</td>
+     <td>{{report.test_num}}</td>
+     <td>{{report.pass_num}}</td>
+     {% if report.test_num == report.pass_num %}
+     <td>是</td>
+     {% else %}
+     <td>否</td>
+     {% endif %}
+     <td>{{report.time}}</td>
+     <td>
+         <a href={{report.link}}>下载</a>
+     </td>
+   </tr>
+  {% endfor %} 
+  </table>
+  </body>
+</html>
