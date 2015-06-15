@@ -5,3 +5,4 @@ class ReportForm(forms.Form):
     passNum = forms.IntegerField(min_value=0)
     projectTeamID = forms.IntegerField(min_value=0)
     file = forms.FileField()
+    

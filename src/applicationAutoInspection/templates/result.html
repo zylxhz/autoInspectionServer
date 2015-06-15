@@ -1,31 +1,37 @@
 <html>
   <body>
-  <title>应用巡检自动化系统</title>
+  <title>巡检报告展示平台</title>
   <h1>巡检结果</h1>
   <h2>
   <table>
   <table border="1">
   <tr>
-    <th>项目组</th>
+    <th>系统</th>
+    <th>省份</th>
+    <th>城市</th>
     <th>检测功能点总数</th>
     <th>通过检测的功能点数目</th>
     <th>全部通过</th>
     <th>报告时间</th>
+    <th>报告提交人员</th>
     <th>详细报告</th>
   </tr>
   {% for report in report_list %}  
   <tr>
-     <td>{{report.project_team}}</td>
-     <td>{{report.test_num}}</td>
+     <td>{{report.system}}</td>
+     <td>{{report.province}}</td>
+     <td>{{report.city}}</td>
+     <td>{{report.total_num}}</td>
      <td>{{report.pass_num}}</td>
      {% if report.test_num == report.pass_num %}
      <td>是</td>
      {% else %}
      <td>否</td>
      {% endif %}
-     <td>{{report.time}}</td>
+     <td>{{report.year}}-{{report.month}}-{{report.day}} {{report.time}}</td>
+     <td>{{report.reporter}}</td>     
      <td>
-         <a href={{report.link}}>下载</a>
+     <a href='file:///'>
      </td>
    </tr>
   {% endfor %} 

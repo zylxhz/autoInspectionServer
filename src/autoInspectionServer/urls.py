@@ -15,12 +15,14 @@ Including another URLconf
 """
 from django.conf.urls import include, url
 from django.contrib import admin
-from applicationAutoInspection.views import upload, upload_report, success, result
+from applicationAutoInspection.views import result, download_report
 
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^upload/$', upload),
-    url(r'^uploadreport/$', upload_report),
-    url(r'^success/$', success),
+    url(r'^downloadreport/', download_report),
+#    url(r'admin/index.html', index),
+#    url(r'^upload/$', upload),
+#    url(r'^uploadreport/$', upload_report),
+#    url(r'^success/$', success),
     url(r'^result/$', result)
 ]
