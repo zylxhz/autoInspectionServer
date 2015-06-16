@@ -22,10 +22,10 @@ def upload(request):
     html = t.render(Context())
     return HttpResponse(html)
 
-def handle_uploaded_file(f, project):
+def handle_uploaded_file(f, system):
     file_name = ""
     try:
-        path = MEDIA_ROOT + project + time.strftime('/%Y/%m/%d/')
+        path = MEDIA_ROOT + system + time.strftime('/%Y/%m/%d/')
         if not os.path.exists(path):
             os.makedirs(path)
             suffix = os.path.splitext(f.name)[1]
@@ -36,7 +36,8 @@ def handle_uploaded_file(f, project):
             destination.close()
     except Exception, e:
         print e
-    return file_name
+#        relative_path = 'report' + 
+    return file_name.replace(MEDIA_ROOT, 'report/')
 
 
 @csrf_exempt
@@ -46,8 +47,8 @@ def upload_report(request):
         form = ReportForm(request.POST, request.FILES)
         if form.is_valid():
             data = form.cleaned_data
-            year, month, day, hour, minute, second = time.localtime( )
-            report = Report(reportor = data['reportor'], system = data['system'], province = data['province'], city = data['city'], year = year, month = month, day = day, time = hour + ':' + minute + ':' + second, total_num = data['testNum'], pass_num = data['passNum'])
+            year, month, day, hour, minute, second, w, y, i = time.localtime( )
+            report = Report(reporter = data['reporter'], system = data['system'], province = data['province'], city = data['city'], year = year, month = month, day = day, time = str(hour) + ':' + str(minute) + ':' + str(second), total_num = data['testNum'], pass_num = data['passNum'])
             report.path = handle_uploaded_file(request.FILES['file'], report.system)
             report.save()    
             return HttpResponseRedirect('/success/')
@@ -66,16 +67,16 @@ def result(request):
     html = t.render(Context({'report_list' : report_list}))
     return HttpResponse(html)
 
-def download_report(request):
-    if request.method == 'POST':
-        filename = request['fileName']                    
-        wrapper = FileWrapper(file(filename))
-        response = HttpResponse(wrapper, content_type='text/plain')
-        response['Content-Length'] = os.path.getsize(filename)
-        response['Content-Encoding'] = 'utf-8'
-        response['Content-Disposition'] = 'attachment;filename=%s' % filename
-        return response
-    return render(request,'result.html',locals())    
+#def download_report(request):
+#    if request.method == 'POST':
+#        filename = request['fileName']                    
+#        wrapper = FileWrapper(file(filename))
+#        response = HttpResponse(wrapper, content_type='text/plain')
+#        response['Content-Length'] = os.path.getsize(filename)
+#        response['Content-Encoding'] = 'utf-8'
+#        response['Content-Disposition'] = 'attachment;filename=%s' % filename
+#        return response
+#    return render(request,'result.html',locals())    
 
 
     
