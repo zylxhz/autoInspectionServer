@@ -1,6 +1,7 @@
 #coding:utf-8
 from .forms import ReportForm
 from applicationAutoInspection.models import Report
+from autoInspectionServer.settings import MEDIA_ROOT
 from django.http.response import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, render_to_response
 from django.template.context import Context, RequestContext
@@ -24,7 +25,7 @@ def upload(request):
 def handle_uploaded_file(f, project):
     file_name = ""
     try:
-        path = "D:/report/" + project + time.strftime('/%Y/%m/%d/')
+        path = MEDIA_ROOT + project + time.strftime('/%Y/%m/%d/')
         if not os.path.exists(path):
             os.makedirs(path)
             suffix = os.path.splitext(f.name)[1]
@@ -37,14 +38,17 @@ def handle_uploaded_file(f, project):
         print e
     return file_name
 
+
 @csrf_exempt
 def upload_report(request):
+    
     if request.method == 'POST':
         form = ReportForm(request.POST, request.FILES)
         if form.is_valid():
             data = form.cleaned_data
             year, month, day, hour, minute, second = time.localtime( )
             report = Report(reportor = data['reportor'], system = data['system'], province = data['province'], city = data['city'], year = year, month = month, day = day, time = hour + ':' + minute + ':' + second, total_num = data['testNum'], pass_num = data['passNum'])
+            report.path = handle_uploaded_file(request.FILES['file'], report.system)
             report.save()    
             return HttpResponseRedirect('/success/')
     else:

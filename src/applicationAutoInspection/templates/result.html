@@ -23,7 +23,7 @@
      <td>{{report.city}}</td>
      <td>{{report.total_num}}</td>
      <td>{{report.pass_num}}</td>
-     {% if report.test_num == report.pass_num %}
+     {% if report.total_num == report.pass_num %}
      <td>是</td>
      {% else %}
      <td>否</td>
@@ -31,7 +31,7 @@
      <td>{{report.year}}-{{report.month}}-{{report.day}} {{report.time}}</td>
      <td>{{report.reporter}}</td>     
      <td>
-     <a href='file:///'>
+     <a href= ../{{report.path}}>查看报告</a>
      </td>
    </tr>
   {% endfor %} 
