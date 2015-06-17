@@ -10,6 +10,7 @@ from django.views.decorators.csrf import csrf_exempt
 from rexec import FileWrapper
 import datetime
 import os
+import re
 import time
 
 #reporter_list = ['张三', '李四']
@@ -22,22 +23,40 @@ def upload(request):
     html = t.render(Context())
     return HttpResponse(html)
 
-def handle_uploaded_file(f, system):
-    file_name = ""
+def handle_uploaded_file(f_report, f_log, system):
+    '''
+    f_report表示巡检人员提交的report.html文件
+    f_log表示巡检人员提交的log.html文件
+    system表示巡检的系统
+    '''
+    report_file_name = ""
     try:
-        path = MEDIA_ROOT + system + time.strftime('/%Y/%m/%d/')
+        #在服务器上创建路径存储巡检人员提交的报告
+        path = MEDIA_ROOT + system + time.strftime('/%Y/%m/%d/%H%M%S/')
         if not os.path.exists(path):
             os.makedirs(path)
-            suffix = os.path.splitext(f.name)[1]
-            file_name = path + time.strftime('%H%M%S') + suffix
-            destination = open(file_name, 'wb+')
-            for chunk in f.chunks():
-                destination.write(chunk)
-            destination.close()
+        #将report.html和log.html存入服务器
+        report_file_name = path + 'report.html'
+        log_file_name = path + 'log.html'
+        dest_report = open(report_file_name, 'wb+')
+        all_report_text = f_report.read()
+        dest_report.write(all_report_text)
+        dest_report.close()
+        dest_log = open(log_file_name, 'wb+')
+        all_log_text = f_log.read()
+        dest_log.write(all_log_text)
+        dest_log.close()
+        
+        #抽取通过测试的数目和未通过的数目
+        pattern = re.compile(r'"fail":\d+,"label":"All Tests","pass":\d+')
+        match = pattern.search(all_report_text)
+        str = match.group()
+        nums = re.findall(r'\d+', str)
+        fail_num = int(nums[0])
+        pass_num = int(nums[1])
     except Exception, e:
         print e
-#        relative_path = 'report' + 
-    return file_name.replace(MEDIA_ROOT, 'report/')
+    return report_file_name.replace(MEDIA_ROOT, 'report/'), fail_num + pass_num, pass_num
 
 
 @csrf_exempt
@@ -48,8 +67,8 @@ def upload_report(request):
         if form.is_valid():
             data = form.cleaned_data
             year, month, day, hour, minute, second, w, y, i = time.localtime( )
-            report = Report(reporter = data['reporter'], system = data['system'], province = data['province'], city = data['city'], year = year, month = month, day = day, time = str(hour) + ':' + str(minute) + ':' + str(second), total_num = data['testNum'], pass_num = data['passNum'])
-            report.path = handle_uploaded_file(request.FILES['file'], report.system)
+            report = Report(reporter = data['reporter'], system = data['system'], province = data['province'], city = data['city'], year = year, month = month, day = day, time = str(hour) + ':' + str(minute) + ':' + str(second))
+            report.path, report.total_num, report.pass_num = handle_uploaded_file(request.FILES['report_file'], request.FILES['log_file'], report.system)
             report.save()    
             return HttpResponseRedirect('/success/')
     else:
