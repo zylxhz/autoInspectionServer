@@ -28,7 +28,7 @@
      {% else %}
      <td>否</td>
      {% endif %}
-     <td>{{report.sub_time}}</td>
+     <td>{{report.sub_time|date:"Y-m-d H:i:s"}}</td>
      <td>{{report.reporter}}</td>     
      <td>
      <a href= ../{{report.path}}>查看报告</a>
