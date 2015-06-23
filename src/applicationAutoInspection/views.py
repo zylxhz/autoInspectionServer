@@ -66,8 +66,7 @@ def upload_report(request):
         form = ReportForm(request.POST, request.FILES)
         if form.is_valid():
             data = form.cleaned_data
-            year, month, day, hour, minute, second, w, y, i = time.localtime( )
-            report = Report(reporter = data['reporter'], system = data['system'], province = data['province'], city = data['city'], year = year, month = month, day = day, time = str(hour) + ':' + str(minute) + ':' + str(second))
+            report = Report(reporter = data['reporter'], system = data['system'], province = data['province'], city = data['city'])
             report.path, report.total_num, report.pass_num = handle_uploaded_file(request.FILES['report_file'], request.FILES['log_file'], report.system)
             report.save()    
             return HttpResponseRedirect('/success/')
