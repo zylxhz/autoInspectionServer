@@ -5,7 +5,7 @@ from django.contrib import admin
 class ReportAdmin(admin.ModelAdmin):
     
     
-    list_display=('reporter', 'system', 'province', 'city', 'sub_time', 'total_num', 'pass_num')   #指定要显示的字段
+    list_display=('reporter', 'system', 'province', 'city', 'sub_time', 'total_num', 'pass_num', 'report_file')   #指定要显示的字段
     list_filter = ('reporter', 'system', 'province', 'city', 'sub_time')   #指定列表过滤器，右边将会出现一个快捷的日期过滤选项，
 #                      #以方便开发人员快速地定位到想要的数据，同样你也可以指定非日期型类型的字段                
 #

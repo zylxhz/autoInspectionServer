@@ -102,5 +102,6 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-MEDIA_ROOT = os.path.join(BASE_DIR,'report/').replace('\\','/') 
+#MEDIA_ROOT = os.path.join(BASE_DIR,'report/').replace('\\','/')
+MEDIA_ROOT= 'D:\\' 
 MEDIA_URL = '/report/'
