@@ -1,0 +1,127 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="author" content="zyl">
+    <link rel="stylesheet" type="text/css" href="{% static 'applicationAutoInspection/css/base.css' %}"/>
+    <link rel="stylesheet" type="text/css" href="{% static 'applicationAutoInspection/css/reportlist.css' %}"/>	
+	<link rel="stylesheet" type="text/css" href="{% static 'applicationAutoInspection/css/pikaday.css' %}"/>	
+	<script src= "{% static 'applicationAutoInspection/js/jquery-1.11.3.min.js' %}"></script>
+	<script src= "{% static 'applicationAutoInspection/js/moment.js' %}"></script>
+	<script src= "{% static 'applicationAutoInspection/js/pikaday.js' %}"></script>
+	<script src= "{% static 'applicationAutoInspection/js/pikaday.js' %}"></script>
+	<script src= "{% static 'applicationAutoInspection/js/distpicker.data.js' %}"></script>
+	<script src= "{% static 'applicationAutoInspection/js/distpicker.js' %}"></script>
+  </head>
+  <body>
+    <title>巡检报告展示平台</title>
+	<div id="header">
+	  <h1 id="headerTxt">巡检报告展示平台</h1>
+    </div>
+    <div id="adiv">
+	    <div id="condition">
+	    <h1>查询条件</h1>
+	    <form id="searchForm" method="GET" action="/search/">
+	      <span class="label">系统</span>
+		  <input type="text" name="system" value={{qsystem}}>
+		  <span class="label">报告提交人员</span>
+		  <input type="text" name="reporter" />
+<!--
+		  <span class="label">省份</span>
+		  <input type="text" name="province" />
+		  <span class="label">城市</span>
+		  <input type="text" name="city" />
+		  <br/>
+--> 
+          <div class="distpicker1">
+		    <span class="label">地区</span>
+            <select name="province" form="searchForm"></select>
+            <select name="city" form="searchForm"></select>
+          </div>
+		  <span class="label">开始日期</span>
+		  <input type="text" id="datepickerb" name="begin_date" />
+		  <span class="label">结束日期</span>
+		  <input type="text" id="datepickere" name="end_date"/>
+		  <div class="status">
+		    <input type="radio" name="status" value="all" checked="checked" />所有 
+            <input type="radio" name="status" value="fail" />仅不通过 
+            <input type="radio" name="status" value="pass" />仅通过 
+          </div> 
+		  <input id="q" type="submit" value="查询">
+	    </form>
+	    </div>
+		<div id="operation">
+		<a href="/result" id="today">今日巡检报告</a>
+		<br/>
+		<a href="/totalresult" id="all">所有巡检报告</a>
+		</div>
+    </div> 	
+  <div id="reportlist">
+    <h1>巡检结果</h1>
+	<table class="reportlist">
+    <tr>
+		<th>系统</th>
+		<th>省份</th>
+		<th>城市</th>
+		<th>检测功能点总数</th>
+		<th>通过检测的功能点数目</th>
+		<th>通过率</th>
+		<th>报告时间</th>
+		<th>报告提交人员</th>
+		<th>详细报告</th>
+	</tr>
+	{% for report in report_list %}
+	{% if report.total_num == report.pass_num %}
+	<tr class="good">
+    {% else %}
+	<tr class="bad">
+    {% endif %}	
+		<td>{{report.system}}</td>
+		<td>{{report.province}}</td>
+		<td>{{report.city}}</td>
+		<td>{{report.total_num}}</td>
+		<td>{{report.pass_num}}</td>
+		<td>{% widthratio report.pass_num report.total_num 100 %}%</td>
+		<td>{{report.sub_time|date:"Y-m-d H:i:s"}}</td>
+		<td>{{report.reporter}}</td>     
+		<td>
+		<a href= {{report.report_file.url}}>查看报告</a>
+		</td>
+	</tr>
+	{% endfor %} 
+	</table>
+  </div>
+  <div class="pagination">
+    <span class="step-links">
+        {% if report_list.has_previous %}
+            <a href="?page={{report_list.previous_page_number}}">前一页</a>
+        {% endif %}
+
+        <span class="current">
+           {{ report_list.number }} / {{ report_list.paginator.num_pages }}页
+        </span>
+
+        {% if report_list.has_next %}
+            <a  href="?page={{report_list.next_page_number }}">后一页</a>
+        {% endif %}
+    </span>
+  </div>
+  
+  <script type="text/javascript">
+    var picker_begin = new Pikaday({
+        field: document.getElementById("datepickerb"),
+        format: 'YYYY-MM-DD'
+    });
+	picker_begin.setDate(new Date())
+	var picker_end = new Pikaday({
+        field: document.getElementById('datepickere'),
+        format: 'YYYY-MM-DD'
+    });
+	picker_end.setDate(new Date())
+	$(".distpicker1").distpicker({
+	autoSelect: false
+	});
+  </script>
+  </body>
+</html>

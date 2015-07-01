@@ -24,7 +24,7 @@
 	    <h1>查询条件</h1>
 	    <form id="searchForm" method="GET" action="/search/">
 	      <span class="label">系统</span>
-		  <input type="text" name="system" />
+		  <input type="text" name="system" value={{qsystem}}>
 		  <span class="label">报告提交人员</span>
 		  <input type="text" name="reporter" />
 <!--
@@ -95,7 +95,7 @@
   <div class="pagination">
     <span class="step-links">
         {% if report_list.has_previous %}
-            <a href="?page={{ report_list.previous_page_number }}">前一页</a>
+            <a href="?page={{report_list.previous_page_number}}">前一页</a>
         {% endif %}
 
         <span class="current">
@@ -103,7 +103,7 @@
         </span>
 
         {% if report_list.has_next %}
-            <a href="?page={{ report_list.next_page_number }}">后一页</a>
+            <a  href="?page={{report_list.next_page_number }}">后一页</a>
         {% endif %}
     </span>
   </div>
