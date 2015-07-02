@@ -16,7 +16,7 @@
 }
 
 #adiv{
-   width: 1200px;
+   min-height:100px;
    border-bottom: 1px solid #ddd;
    border-top: 1px solid #fff;
    border-right: 1px solid #ddd;
@@ -26,17 +26,20 @@
 }
 
 #condition{
+   width: 800px;
+   min-height:100px; 
    border-bottom: 1px solid #ddd;
    border-top: 1px solid #fff;
    border-right: 1px solid #ddd;
    padding: 2px 8px 3px;
    text-align: left;
    float: left;
-   width: 1000px
+   
 }
 
 #operation{
-   margin-left:1000px;
+   margin-left:800px;
+   min-height:100px;
    text-align: center;
 }
 

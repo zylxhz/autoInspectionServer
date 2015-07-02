@@ -13,8 +13,8 @@ Including another URLconf
     1. Add an import:  from blog import urls as blog_urls
     2. Add a URL to urlpatterns:  url(r'^blog/', include(blog_urls))
 """
-from applicationAutoInspection.views import todayResult, totalResult, upload, upload_report, \
-    success, IndexView, search
+from applicationAutoInspection.views import todayResult, totalResult, upload, \
+    upload_report, success, IndexView, search, result
 from autoInspectionServer import settings
 from django.conf.urls import include, url
 from django.conf.urls.static import static
@@ -27,9 +27,10 @@ urlpatterns = [
     url(r'^upload/$', upload),
     url(r'^uploadreport/$', upload_report),
     url(r'^success/$', success),
-    url(r'^result/$', todayResult),
+#    url(r'^result/$', todayResult),
+    url(r'^result/$', result),
     url(r'^$', IndexView.as_view(), name='index'),
-    url(r'^search/', search),
+    url(r'^search/', search, name='search'),
     url(r'^totalresult/', totalResult),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

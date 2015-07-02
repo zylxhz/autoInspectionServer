@@ -107,6 +107,11 @@ def success(request):
     html = t.render(Context())
     return HttpResponse(html)   
 
+def result(request):
+    t = get_template('result.html')
+    html = t.render(Context())
+    return HttpResponse(html)  
+
 def todayResult(request):
     report_list = Report.objects.all()
     report_list = report_list.filter(sub_time__gte=datetime.date.today())
@@ -147,7 +152,6 @@ def search(request):
     q_begin_date = request.REQUEST['begin_date']
     q_end_date = request.REQUEST['end_date']
     q_status = request.REQUEST['status'] 
-    t = get_template('totalResult.html')
     report_list = Report.objects.all()
     if q_system != '':
         report_list = report_list.filter(system=q_system)
@@ -165,19 +169,7 @@ def search(request):
         report_list = report_list.exclude(total_num=F('pass_num'))
     if q_status == 'pass':
         report_list = report_list.filter(total_num=F('pass_num'))
-    
-    paginator = Paginator(report_list, 2) # Show 2 reports per page
-    page = request.GET.get('page')
-    try:
-        report_list = paginator.page(page)
-    except PageNotAnInteger:
-        # If page is not an integer, deliver first page.
-        report_list = paginator.page(1)
-    except EmptyPage:
-        # If page is out of range (e.g. 9999), deliver last page of results.
-        report_list = paginator.page(paginator.num_pages)
-    html = t.render(Context({'report_list' : report_list, 'qsystem' : q_system}))
-    return HttpResponse(html)  
+    return render_to_response('report_list_div.html', {"report_list": report_list})
 
 
     
