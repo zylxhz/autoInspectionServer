@@ -170,7 +170,7 @@ def search(request):
     if q_status == 'pass':
         report_list = report_list.filter(total_num=F('pass_num'))
     
-    paginator = Paginator(report_list, 2) # Show 25 contacts per page
+    paginator = Paginator(report_list, 2) # Show 2 reports per page
     page = request.GET.get('page')
     try:
         reports = paginator.page(page)
