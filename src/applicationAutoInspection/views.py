@@ -169,7 +169,19 @@ def search(request):
         report_list = report_list.exclude(total_num=F('pass_num'))
     if q_status == 'pass':
         report_list = report_list.filter(total_num=F('pass_num'))
-    return render_to_response('report_list_div.html', {"report_list": report_list})
+    
+    paginator = Paginator(report_list, 2) # Show 25 contacts per page
+    page = request.GET.get('page')
+    try:
+        reports = paginator.page(page)
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+        reports = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range (e.g. 9999), deliver last page of results.
+        reports = paginator.page(paginator.num_pages)
+
+    return render_to_response('report_list_div.html', {"reports": reports})
 
 
     
