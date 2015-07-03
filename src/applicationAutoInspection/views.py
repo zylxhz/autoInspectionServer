@@ -169,7 +169,8 @@ def search(request):
         report_list = report_list.exclude(total_num=F('pass_num'))
     if q_status == 'pass':
         report_list = report_list.filter(total_num=F('pass_num'))
-    
+    #对查询结果进行排序，先按系统名称的升序排序，然后按照提交日期降序排序。
+    report_list = report_list.order_by('system', '-sub_time')
     paginator = Paginator(report_list, 2) # Show 2 reports per page
     page = request.GET.get('page')
     try:
