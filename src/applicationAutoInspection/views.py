@@ -16,12 +16,11 @@ import os
 import re
 import time
 
-#reporter_list = ['张三', '李四']
-#report_list =  [Report(reporter_list[0],100, 100, '2015-05-29 18:00:00', 'D:\report\bj\2015\05\29\180000.pdf'),
-#                Report(reporter_list[1],70, 70, '2015-05-29 18:30:00', 'D:\report\bj\2015\05\29\183000.pdf')]
 
 # Create your views here.
 
+#每页展示的报告数目
+REPORT_PER_PAGE = 5;
     
 #def upload(request):
 #    t = get_template('upload.html')
@@ -167,7 +166,8 @@ def search(request):
         report_list = report_list.filter(total_num=F('pass_num'))
     #对查询结果进行排序，先按系统名称的升序排序，然后按照提交日期降序排序。
     report_list = report_list.order_by('system', '-sub_time')
-    paginator = Paginator(report_list, 2) # Show 2 reports per page
+    #分页
+    paginator = Paginator(report_list, REPORT_PER_PAGE)
     page = request.GET.get('page')
     try:
         reports = paginator.page(page)
