@@ -22,18 +22,11 @@ import time
 
 # Create your views here.
 
-class IndexView(generic.ListView):
-    template_name = 'index.html'
-    context_object_name = 'report_list'
-
-    def get_queryset(self):
-        """返回所有报告."""
-        return Report.objects.all()
     
-def upload(request):
-    t = get_template('upload.html')
-    html = t.render(Context())
-    return HttpResponse(html)
+#def upload(request):
+#    t = get_template('upload.html')
+#    html = t.render(Context())
+#    return HttpResponse(html)
 
 def handle_uploaded_file(f_report, f_log, system):
     '''
@@ -112,37 +105,37 @@ def result(request):
     html = t.render(Context())
     return HttpResponse(html)  
 
-def todayResult(request):
-    report_list = Report.objects.all()
-    report_list = report_list.filter(sub_time__gte=datetime.date.today())
-    report_list = report_list.order_by('system', '-sub_time')
-    paginator = Paginator(report_list, 2) # Show 2 reports per page
+#def todayResult(request):
+#    report_list = Report.objects.all()
+#    report_list = report_list.filter(sub_time__gte=datetime.date.today())
+#    report_list = report_list.order_by('system', '-sub_time')
+#    paginator = Paginator(report_list, 2) # Show 2 reports per page
+#
+#    page = request.GET.get('page')
+#    try:
+#        report_list = paginator.page(page)
+#    except PageNotAnInteger:
+#        # If page is not an integer, deliver first page.
+#        report_list = paginator.page(1)
+#    except EmptyPage:
+#        # If page is out of range (e.g. 9999), deliver last page of results.
+#        report_list = paginator.page(paginator.num_pages)
+#    return render_to_response('todayResult.html', {"report_list": report_list})
 
-    page = request.GET.get('page')
-    try:
-        report_list = paginator.page(page)
-    except PageNotAnInteger:
-        # If page is not an integer, deliver first page.
-        report_list = paginator.page(1)
-    except EmptyPage:
-        # If page is out of range (e.g. 9999), deliver last page of results.
-        report_list = paginator.page(paginator.num_pages)
-    return render_to_response('todayResult.html', {"report_list": report_list})
-
-def totalResult(request):
-    report_list = Report.objects.all()
-    report_list = report_list.order_by('system', '-sub_time')
-    paginator = Paginator(report_list, 2) # Show 2 reports per page
-    page = request.GET.get('page')
-    try:
-        report_list = paginator.page(page)
-    except PageNotAnInteger:
-        # If page is not an integer, deliver first page.
-        report_list = paginator.page(1)
-    except EmptyPage:
-        # If page is out of range (e.g. 9999), deliver last page of results.
-        report_list = paginator.page(paginator.num_pages)
-    return render_to_response('totalResult.html', {"report_list": report_list})
+#def totalResult(request):
+#    report_list = Report.objects.all()
+#    report_list = report_list.order_by('system', '-sub_time')
+#    paginator = Paginator(report_list, 2) # Show 2 reports per page
+#    page = request.GET.get('page')
+#    try:
+#        report_list = paginator.page(page)
+#    except PageNotAnInteger:
+#        # If page is not an integer, deliver first page.
+#        report_list = paginator.page(1)
+#    except EmptyPage:
+#        # If page is out of range (e.g. 9999), deliver last page of results.
+#        report_list = paginator.page(paginator.num_pages)
+#    return render_to_response('totalResult.html', {"report_list": report_list})
 
 def search(request):
     q_system = request.REQUEST['system']
@@ -151,6 +144,9 @@ def search(request):
     q_city = request.REQUEST['city']
     q_begin_date = request.REQUEST['begin_date']
     q_end_date = request.REQUEST['end_date']
+    end_date = datetime.datetime.strptime(q_end_date,'%Y-%m-%d')
+    end_date = end_date +  datetime.timedelta(days=1)
+    q_end_date = end_date.strftime('%Y-%m-%d')
     q_status = request.REQUEST['status'] 
     report_list = Report.objects.all()
     if q_system != '':
@@ -164,7 +160,7 @@ def search(request):
     if q_begin_date != '':
         report_list = report_list.filter(sub_time__gte=q_begin_date)
     if q_end_date != '':
-        report_list = report_list.filter(sub_time__lte=q_end_date)
+        report_list = report_list.filter(sub_time__lt=q_end_date)
     if q_status == 'fail':
         report_list = report_list.exclude(total_num=F('pass_num'))
     if q_status == 'pass':

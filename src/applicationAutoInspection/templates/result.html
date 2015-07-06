@@ -48,7 +48,7 @@
 		<!--
 	    <button type="button" id="btn_today">今日巡检报告</button>
         -->
-		<a href="#" id="today">今日巡检报告</a>
+		<a href="/result" id="today">今日巡检报告</a>
 		<!--
 		<button type="button" id="btn_total">所有巡检报告</button>
 		
@@ -85,7 +85,7 @@
 	  $("#province").val('');
 	  $("#city").val('');
 	  $("input[type=radio][value=all]").attr("checked",'checked');
-	  var today = new Date();
+	  var today = $("#datepickerb").val();
 	  $("#reportlist").load('{% url 'search' %}?' + 'system=&reporter=&province=&city=&' + 'begin_date=' + today + '&end_date=' + today + '&status=all');
 	  
 	  function getQueryParam(){
@@ -100,7 +100,7 @@
 	               + '&begin_date=' + q_begin_date + '&end_date=' + q_end_date + '&status=' + q_status;
 	  }
 	  
-	  var param = "";
+	  var param = getQueryParam();
 	  
 	  $("#btn_q").click(function(){
 	    param = getQueryParam();
