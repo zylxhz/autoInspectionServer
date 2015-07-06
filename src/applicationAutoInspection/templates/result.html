@@ -104,7 +104,8 @@
 			  $("#city").val('');
 			  $("input[type=radio][value=all]").attr("checked",'checked');
 			  var today = $("#datepickerb").val();
-			  $("#reportlist").load('{% url 'search' %}?' + 'system=&reporter=&province=&city=&' + 'begin_date=' + today + '&end_date=' + today + '&status=all');
+			  var str_url = encodeURI('{% url 'search' %}?' + 'system=&reporter=&province=&city=&' + 'begin_date=' + today + '&end_date=' + today + '&status=all')
+			  $("#reportlist").load(str_url);
 			  
 			  function getQueryParam(){
 				var q_system = $("#system").val();
@@ -122,17 +123,20 @@
 			  
 			  $("#btn_q").click(function(){
 				param = getQueryParam();
-				$("#reportlist").load('{% url 'search' %}?' + param);
+				var strurl = encodeURI('{% url 'search' %}?' + param);
+				$("#reportlist").load(strurl);
 			  });
 			  
 			  $("#reportlist").delegate("#pre", "click", function(){
 				var pageNum = $("#pre").attr("title");
-				$("#reportlist").load('{% url 'search' %}?' + param + '&page=' + pageNum);
+				var strurl = encodeURI('{% url 'search' %}?' + param + '&page=' + pageNum);
+				$("#reportlist").load(strurl);
 			  });
 			
 			  $("#reportlist").delegate("#next", "click", function(){
 				var pageNum = $("#next").attr("title");
-				$("#reportlist").load('{% url 'search' %}?' + param + '&page=' + pageNum);
+				var strurl = encodeURI('{% url 'search' %}?' + param + '&page=' + pageNum);
+				$("#reportlist").load(strurl);
 			  });
 			  
 			});
