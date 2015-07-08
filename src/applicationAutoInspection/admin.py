@@ -1,5 +1,6 @@
 #coding:utf-8
 from .models import Report
+from applicationAutoInspection.models import System
 from django.contrib import admin
 
 class ReportAdmin(admin.ModelAdmin):
@@ -21,3 +22,4 @@ class ReportAdmin(admin.ModelAdmin):
 
 # Register your models here.
 admin.site.register(Report, ReportAdmin)
+admin.site.register(System)

@@ -1,15 +1,15 @@
 #coding:utf-8
 from .forms import ReportForm
-from applicationAutoInspection.models import Report
+from applicationAutoInspection.models import Report, System
 from autoInspectionServer.settings import MEDIA_ROOT
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
+from django.db.models import F
 from django.http.response import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, render_to_response
 from django.template.context import Context, RequestContext
 from django.template.loader import get_template
 from django.views import generic
 from django.views.decorators.csrf import csrf_exempt
-from django.db.models import F
 from rexec import FileWrapper
 import datetime
 import os
@@ -20,7 +20,7 @@ import time
 # Create your views here.
 
 #每页展示的报告数目
-REPORT_PER_PAGE = 5;
+REPORT_PER_PAGE = 50;
     
 #def upload(request):
 #    t = get_template('upload.html')
@@ -101,8 +101,10 @@ def success(request):
 
 def result(request):
     t = get_template('result.html')
-    html = t.render(Context())
-    return HttpResponse(html)  
+    systems = System.objects.all()
+    context = {'systems': systems}
+    html = t.render(context)
+    return HttpResponse(html) 
 
 #def todayResult(request):
 #    report_list = Report.objects.all()

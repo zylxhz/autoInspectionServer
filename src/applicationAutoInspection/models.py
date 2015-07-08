@@ -12,3 +12,6 @@ class Report(models.Model):
     pass_num = models.IntegerField(u'通过测试的数目')
     report_file = models.FileField(u'报告', upload_to='report/%Y/%m/%d/%H%M%S')
     log_file = models.FileField(upload_to='report/%Y/%m/%d/%H%M%S')
+    
+class System(models.Model):
+    name = models.CharField(u'系统',  max_length=100)

@@ -39,7 +39,12 @@
 				<div class="form-group">
 					<label for="system" class="col-md-1 control-label">系统</label>
 					<div class="col-md-2">
-						<input type="text" id="system" >
+						<select id="system" >
+						  <option value="" selected>—— 系统 ——</option>
+						  {% for system in systems %}
+						  <option value={{system.name}}>{{system.name}}</option>
+						  {% endfor %}
+						</select>
 					</div>
 					<label for="reporter" class="col-md-2 control-label">报告提交人员</label>
 					<div class="col-md-2">

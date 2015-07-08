@@ -35,11 +35,11 @@
     </table>
 	<ul class="pager">
 	    {% if reports.has_previous %}
-		<li><button type="button" class="btn btn-primary btn-xs" id= "pre" title={{ reports.previous_page_number }}>前一页</button></li>
+		<li><button type="button" class="btn btn-primary btn-xs" id= "pre" title={{ reports.previous_page_number }}>上一页</button></li>
         {% endif %}
 	    <label>{{ reports.number }} / {{ reports.paginator.num_pages }} 页</label>
         {% if reports.has_next %}
-		<li><button type="button" class="btn btn-primary btn-xs" id= "next" title={{ reports.next_page_number }}>后一页</button></li>    
+		<li><button type="button" class="btn btn-primary btn-xs" id= "next" title={{ reports.next_page_number }}>下一页</button></li>    
         {% endif %}          
     </ul>
 </div>
