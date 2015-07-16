@@ -2,19 +2,19 @@
 from .forms import ReportForm
 from applicationAutoInspection.models import Report, System
 from autoInspectionServer.settings import MEDIA_ROOT
+from django.core.files.storage import default_storage
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.db.models import F
 from django.http.response import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render, render_to_response
-from django.template.context import Context, RequestContext
+from django.shortcuts import render_to_response
+from django.template.context import Context
 from django.template.loader import get_template
-from django.views import generic
 from django.views.decorators.csrf import csrf_exempt
-from rexec import FileWrapper
 import datetime
 import os
 import re
 import time
+import zipfile
 
 
 # Create your views here.
@@ -22,73 +22,72 @@ import time
 #每页展示的报告数目
 REPORT_PER_PAGE = 50;
     
-#def upload(request):
-#    t = get_template('upload.html')
-#    html = t.render(Context())
-#    return HttpResponse(html)
+def upload(request):
+    t = get_template('upload.html')
+    html = t.render(Context())
+    return HttpResponse(html)
 
-def handle_uploaded_file(f_report, f_log, system):
+def handle_uploaded_file(f, system, province, reporter):
     '''
-    f_report表示巡检人员提交的report.html文件
-    f_log表示巡检人员提交的log.html文件
+    zip表示提交的报告压缩文件
     system表示巡检的系统
+    province表示所在的省
     '''
-    report_file_name = ""
-    try:
+    report_path = ""
         #在服务器上创建路径存储巡检人员提交的报告
-        path = MEDIA_ROOT + system + time.strftime('/%Y/%m/%d/%H%M%S/')
+    try:
+        path = MEDIA_ROOT + system + os.path.sep + province + os.path.sep + reporter + time.strftime('\\%Y\\%m\\%d\\%H%M%S\\')
         if not os.path.exists(path):
             os.makedirs(path)
-        #将report.html和log.html存入服务器
-        report_file_name = path + 'report.html'
-        log_file_name = path + 'log.html'
-        dest_report = open(report_file_name, 'wb+')
-        all_report_text = f_report.read()
-        dest_report.write(all_report_text)
-        dest_report.close()
-        dest_log = open(log_file_name, 'wb+')
-        all_log_text = f_log.read()
-        dest_log.write(all_log_text)
-        dest_log.close()
-        
-        #抽取通过测试的数目和未通过的数目
-        pattern = re.compile(r'"fail":\d+,"label":"All Tests","pass":\d+')
-        match = pattern.search(all_report_text)
-        str = match.group()
-        nums = re.findall(r'\d+', str)
-        fail_num = int(nums[0])
-        pass_num = int(nums[1])
+        zip_file = open('report.zip', 'wb+')
+        for chunk in f.chunks():
+            zip_file.write(chunk)
+        zip_file.close()
+        zip = zipfile.ZipFile('report.zip')
+        for filename in zip.namelist():
+            data = zip.read(filename)
+            filename = os.path.split(filename)[1]
+            file = open(os.path.join(path, filename), 'wb+')
+            file.write(data)
+            file.close()
+            if filename == 'report.html':
+                report_path = os.path.join(path, filename)
+                report_path = report_path.replace(MEDIA_ROOT, '')
+                #抽取通过测试的数目和未通过的数目
+                pattern = re.compile(r'"fail":\d+,"label":"All Tests","pass":\d+')
+                match = pattern.search(data)
+                str = match.group()
+                nums = re.findall(r'\d+', str)
+                fail_num = int(nums[0])
+                pass_num = int(nums[1])
     except Exception, e:
         print e
-    return report_file_name.replace(MEDIA_ROOT, 'report/'), fail_num + pass_num, pass_num
+    return report_path, fail_num + pass_num, pass_num
 
 
 @csrf_exempt
 def upload_report(request):
-    
-#    if request.method == 'POST':
-#        form = ReportForm(request.POST, request.FILES)
-#        if form.is_valid():
-#            data = form.cleaned_data
-#            report = Report(reporter = data['reporter'], system = data['system'], province = data['province'], city = data['city'])
-#            report.path, report.total_num, report.pass_num = handle_uploaded_file(request.FILES['report_file'], request.FILES['log_file'], report.system)
-#            report.save()    
+      
     if request.method == 'POST':
         form = ReportForm(request.POST, request.FILES)
         if form.is_valid():
             data = form.cleaned_data
-            instance = Report(reporter = data['reporter'], system = data['system'], province = data['province'], city = data['city'], report_file=request.FILES['report_file'], log_file=request.FILES['log_file'])
-            all_report_text = request.FILES['report_file'].read()
-            #抽取通过测试的数目和未通过的数目
-            pattern = re.compile(r'"fail":\d+,"label":"All Tests","pass":\d+')
-            match = pattern.search(all_report_text)
-            match_str = match.group()
-            nums = re.findall(r'\d+', match_str)
-            fail_num = int(nums[0])
-            pass_num = int(nums[1])
-            instance.pass_num = pass_num
-            instance.total_num = fail_num + pass_num             
-            instance.save() 
+#            instance = Report(reporter = data['reporter'], system = data['system'], province = data['province'], city = data['city'], report_file=request.FILES['report_file'], log_file=request.FILES['log_file'])
+#            all_report_text = request.FILES['report_file'].read()
+#            #抽取通过测试的数目和未通过的数目
+#            pattern = re.compile(r'"fail":\d+,"label":"All Tests","pass":\d+')
+#            match = pattern.search(all_report_text)
+#            match_str = match.group()
+#            nums = re.findall(r'\d+', match_str)
+#            fail_num = int(nums[0])
+#            pass_num = int(nums[1])
+#            instance.pass_num = pass_num
+#            instance.total_num = fail_num + pass_num             
+#            instance.save()
+            report_path, total_num, pass_num = handle_uploaded_file(request.FILES['zip'], data['system'], data['province'], data['reporter'])
+            report_url = default_storage.url(report_path)
+            instance = Report(reporter = data['reporter'], system = data['system'], province = data['province'], city = data['city'], total_num = total_num, pass_num = pass_num, report_path = report_url)
+            instance.save()
             return HttpResponseRedirect('/success/')
     else:
         form = ReportForm()
@@ -105,38 +104,6 @@ def result(request):
     context = {'systems': systems}
     html = t.render(context)
     return HttpResponse(html) 
-
-#def todayResult(request):
-#    report_list = Report.objects.all()
-#    report_list = report_list.filter(sub_time__gte=datetime.date.today())
-#    report_list = report_list.order_by('system', '-sub_time')
-#    paginator = Paginator(report_list, 2) # Show 2 reports per page
-#
-#    page = request.GET.get('page')
-#    try:
-#        report_list = paginator.page(page)
-#    except PageNotAnInteger:
-#        # If page is not an integer, deliver first page.
-#        report_list = paginator.page(1)
-#    except EmptyPage:
-#        # If page is out of range (e.g. 9999), deliver last page of results.
-#        report_list = paginator.page(paginator.num_pages)
-#    return render_to_response('todayResult.html', {"report_list": report_list})
-
-#def totalResult(request):
-#    report_list = Report.objects.all()
-#    report_list = report_list.order_by('system', '-sub_time')
-#    paginator = Paginator(report_list, 2) # Show 2 reports per page
-#    page = request.GET.get('page')
-#    try:
-#        report_list = paginator.page(page)
-#    except PageNotAnInteger:
-#        # If page is not an integer, deliver first page.
-#        report_list = paginator.page(1)
-#    except EmptyPage:
-#        # If page is out of range (e.g. 9999), deliver last page of results.
-#        report_list = paginator.page(paginator.num_pages)
-#    return render_to_response('totalResult.html', {"report_list": report_list})
 
 def search(request):
     q_system = request.REQUEST['system']

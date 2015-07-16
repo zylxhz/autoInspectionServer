@@ -10,8 +10,7 @@ class Report(models.Model):
     sub_time = models.DateTimeField(u'提交日期',auto_now=True)
     total_num = models.IntegerField(u'测试用例数目')
     pass_num = models.IntegerField(u'通过测试的数目')
-    report_file = models.FileField(u'报告', upload_to='report/%Y/%m/%d/%H%M%S')
-    log_file = models.FileField(upload_to='report/%Y/%m/%d/%H%M%S')
+    report_path = models.CharField(u'报告', max_length=100)
     
 class System(models.Model):
     name = models.CharField(u'系统',  max_length=100)

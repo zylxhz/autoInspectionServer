@@ -5,6 +5,5 @@ class ReportForm(forms.Form):
     province = forms.CharField()
     city = forms.CharField()
     reporter = forms.CharField()
-    report_file = forms.FileField()
-    log_file = forms.FileField()
+    zip = forms.FileField()
     

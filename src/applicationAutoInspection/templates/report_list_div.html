@@ -28,7 +28,7 @@
 				<td>{% widthratio report.pass_num report.total_num 100 %}%</td>
 				<td>{{report.sub_time|date:"Y-m-d H:i:s"}}</td>
 				<td>{{report.reporter}}</td>     
-				<td><a href= {{report.report_file.url}}>查看报告</a></td>
+				<td><a href= {{report.report_path}}>查看报告</a></td>
 			</tr>
 			{% endfor %}
 		</tbody>
